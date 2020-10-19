@@ -33,15 +33,15 @@ jobs:
         username: ${{ secrets.REGISTRY_USERNAME }}
         password: ${{ secrets.REGISTRY_PASSWORD }}
     - run: |
-        docker build . -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/whoamicore:${GITHUB_REF#refs/tags/}
-        docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/whoamicore:${GITHUB_REF#refs/tags/}
+        docker build . -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/whoamicore:${{ env.RELEASE_VERSION }}
+        docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/whoamicore:${{ env.RELEASE_VERSION }}
 
     - name: 'Deploy to Azure Container Instances'
       uses: 'azure/aci-deploy@v1'
       with:
         resource-group: ${{ secrets.RESOURCE_GROUP }}
         dns-name-label: aci-whoamicore1
-        image: ${{ secrets.REGISTRY_LOGIN_SERVER }}/whoamicore:${GITHUB_REF#refs/tags/}
+        image: ${{ secrets.REGISTRY_LOGIN_SERVER }}/whoamicore:${{ env.RELEASE_VERSION }}
         registry-login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
         registry-username: ${{ secrets.REGISTRY_USERNAME }}
         registry-password: ${{ secrets.REGISTRY_PASSWORD }}
