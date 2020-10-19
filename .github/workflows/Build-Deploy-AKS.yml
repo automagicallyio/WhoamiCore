@@ -1,0 +1,53 @@
+name: Build and push AKS
+
+on:
+  push:
+    tags:
+     - '*'
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: Set env
+      run: echo ::set-env name=RELEASE_VERSION::${GITHUB_REF#refs/tags/}
+
+    - name: Test
+      run: |
+        echo $RELEASE_VERSION
+        echo ${{ env.RELEASE_VERSION }}
+    - name: 'Login via Azure CLI'
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: 'Build and push image'
+      uses: azure/docker-login@v1
+      with:
+        login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
+        username: ${{ secrets.REGISTRY_USERNAME }}
+        password: ${{ secrets.REGISTRY_PASSWORD }}
+    - run: |
+        docker build . -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/whoamicore:${{ env.RELEASE_VERSION }}
+        docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/whoamicore:${{ env.RELEASE_VERSION }}
+
+    - uses: azure/aks-set-context@v1
+      with:
+        creds: '${{ secrets.AZURE_CREDENTIALS }}' # Azure credentials
+        resource-group: 'k8s1-demo-rg'
+        cluster-name: 'k8s1aks'
+      id: login
+
+    - uses: Azure/k8s-deploy@v1
+      with:
+        namespace: default
+        manifests: |
+          .manifests/ingress.yaml
+          .manifests/deployment.yaml
+          .manifests/service.yaml
+        images: |
+          ${{ secrets.REGISTRY_LOGIN_SERVER }}/whoamicore:${{ env.RELEASE_VERSION }}
