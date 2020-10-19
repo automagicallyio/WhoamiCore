@@ -2,8 +2,8 @@ name: Build and push ACI
 
 on:
   push:
-    tags:
-     - '*'
+    branches-ignore:
+      - '**'
 
 jobs:
   build:
