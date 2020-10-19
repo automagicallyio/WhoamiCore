@@ -40,7 +40,7 @@ jobs:
       uses: 'azure/aci-deploy@v1'
       with:
         resource-group: ${{ secrets.RESOURCE_GROUP }}
-        dns-name-label: ${{ secrets.RESOURCE_GROUP }}${GITHUB_REF#refs/tags/}
+        dns-name-label: aci-whoamicore1
         image: ${{ secrets.REGISTRY_LOGIN_SERVER }}/whoamicore:${GITHUB_REF#refs/tags/}
         registry-login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
         registry-username: ${{ secrets.REGISTRY_USERNAME }}
