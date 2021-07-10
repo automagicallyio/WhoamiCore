@@ -39,8 +39,8 @@ jobs:
     - uses: azure/aks-set-context@v1
       with:
         creds: '${{ secrets.AZURE_CREDENTIALS }}' # Azure credentials
-        resource-group: 'k8s1-demo-rg'
-        cluster-name: 'k8s1aks'
+        resource-group: 'whoamicoreDev'
+        cluster-name: 'whoamicoreAksDev'
       id: login
 
     - uses: Azure/k8s-deploy@v1
