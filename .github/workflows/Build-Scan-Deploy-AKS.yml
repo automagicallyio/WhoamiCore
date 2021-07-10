@@ -60,7 +60,8 @@ jobs:
 #     - name: Set env
 #       run: |
 #         # echo "RELEASE_VERSION=$(echo ${GITHUB_REF#refs/tags/})" >> $GITHUB_ENV
-#         echo "RELEASE_VERSION=$(echo ${{ jobs.build.steps.setenv_step.outputs.release_version }})" >> $GITHUB_ENV
+          # echo "x" ${{ jobs.build.steps.setenv_step.outputs.release_version }}
+#         # echo "RELEASE_VERSION=$(echo ${{ jobs.build.steps.setenv_step.outputs.release_version }})" >> $GITHUB_ENV
 
 #     - name: Test
 #       run: |
