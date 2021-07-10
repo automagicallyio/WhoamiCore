@@ -17,7 +17,7 @@ jobs:
     - name: Set version
       id: setversion_sep
       run: |
-        if [ -z "{GITHUB_REF#refs/tags/}" ]
+        if [ ${{ github.event.release.tag_name }} == '' ]
         then
           echo "setting release version to commit sha"
           echo "RELEASE_VERSION=$(echo ${{ github.sha }})" >> $GITHUB_ENV
