@@ -40,7 +40,9 @@ jobs:
         docker build . -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/whoamicore:${{ env.RELEASE_VERSION }}
 
     - name: 'Container Scan'
+      id: container-scan
       uses: Azure/container-scan@v0.1
+      continue-on-error: true
       with:
         image-name: ${{ secrets.REGISTRY_LOGIN_SERVER }}/whoamicore:${{ env.RELEASE_VERSION }}
     
