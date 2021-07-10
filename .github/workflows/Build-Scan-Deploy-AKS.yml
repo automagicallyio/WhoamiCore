@@ -52,20 +52,20 @@ jobs:
         instrumentation-key: ${{ secrets.AI_INSTRUMENTATION_KEY }}
         scan-results-path: ${{ steps.container-scan.outputs.scan-report-path }}
 
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
+#   deploy:
+#     needs: build
+#     runs-on: ubuntu-latest
     
-    steps:
-    - name: Set env
-      run: |
-        # echo "RELEASE_VERSION=$(echo ${GITHUB_REF#refs/tags/})" >> $GITHUB_ENV
-        echo "RELEASE_VERSION=$(echo ${{ jobs.build.steps.setenv_step.outputs.release_version }})" >> $GITHUB_ENV
+#     steps:
+#     - name: Set env
+#       run: |
+#         # echo "RELEASE_VERSION=$(echo ${GITHUB_REF#refs/tags/})" >> $GITHUB_ENV
+#         echo "RELEASE_VERSION=$(echo ${{ jobs.build.steps.setenv_step.outputs.release_version }})" >> $GITHUB_ENV
 
-    - name: Test
-      run: |
-        echo $RELEASE_VERSION
-        echo ${{ env.RELEASE_VERSION }}
+#     - name: Test
+#       run: |
+#         echo $RELEASE_VERSION
+#         echo ${{ env.RELEASE_VERSION }}
 
     - name: 'Push image'
       uses: azure/docker-login@v1
