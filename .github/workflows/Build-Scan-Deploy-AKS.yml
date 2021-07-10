@@ -14,11 +14,19 @@ jobs:
     steps:
     - uses: actions/checkout@v1
 
-    - name: Set env
-      id: setenv_step
+    - name: Set version
+      id: setversion_sep
       run: |
-        echo "RELEASE_VERSION=$(echo ${GITHUB_REF#refs/tags/})" >> $GITHUB_ENV
-        echo "::set-output name=release_version::${GITHUB_REF#refs/tags/})"
+        if [ -z "{GITHUB_REF#refs/tags/}" ]
+        then
+          echo "setting release version to commit sha"
+          echo "RELEASE_VERSION=$(echo ${{ github.sha }})" >> $GITHUB_ENV
+          echo "::set-output name=release_version::${{ github.sha }})"
+        else
+          echo "setting release version to release tag version"
+          echo "RELEASE_VERSION=$(echo ${GITHUB_REF#refs/tags/})" >> $GITHUB_ENV
+          echo "::set-output name=release_version::${GITHUB_REF#refs/tags/})"
+        fi
 
     - name: Test
       run: |
@@ -59,11 +67,11 @@ jobs:
 #     runs-on: ubuntu-latest
     
 #     steps:
-#     - name: Set env
+#     - name: Set versio
 #       run: |
 #         # echo "RELEASE_VERSION=$(echo ${GITHUB_REF#refs/tags/})" >> $GITHUB_ENV
-          # echo "x" ${{ jobs.build.steps.setenv_step.outputs.release_version }}
-#         # echo "RELEASE_VERSION=$(echo ${{ jobs.build.steps.setenv_step.outputs.release_version }})" >> $GITHUB_ENV
+          # echo "x" ${{ jobs.build.steps.setversion_sep.outputs.release_version }}
+#         # echo "RELEASE_VERSION=$(echo ${{ jobs.build.steps.setversion_sep.outputs.release_version }})" >> $GITHUB_ENV
 
 #     - name: Test
 #       run: |
