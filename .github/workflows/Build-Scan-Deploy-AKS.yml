@@ -14,19 +14,21 @@ jobs:
     steps:
     - uses: actions/checkout@v1
 
-    - name: Set version
+    - name: Set version to commit sha
       id: setversion_sep
+      if: github.event_name == 'workflow_dispatch'
       run: |
-        if [ ${{ github.event.release.tag_name }} == '' ]
-        then
-          echo "setting release version to commit sha"
-          echo "RELEASE_VERSION=$(echo ${{ github.sha }})" >> $GITHUB_ENV
-          echo "::set-output name=release_version::${{ github.sha }})"
-        else
-          echo "setting release version to release tag version"
-          echo "RELEASE_VERSION=$(echo ${GITHUB_REF#refs/tags/})" >> $GITHUB_ENV
-          echo "::set-output name=release_version::${GITHUB_REF#refs/tags/})"
-        fi
+        echo "setting release version to commit sha"
+        echo "RELEASE_VERSION=$(echo ${{ github.sha }})" >> $GITHUB_ENV
+        echo "::set-output name=release_version::${{ github.sha }})"
+
+    - name: Set version to release tag
+      id: setversion_sep
+      if: ${{ github.event.release.tag_name }} == ''
+      run: |
+        echo "setting release version to release tag version"
+        echo "RELEASE_VERSION=$(echo ${GITHUB_REF#refs/tags/})" >> $GITHUB_ENV
+        echo "::set-output name=release_version::${GITHUB_REF#refs/tags/})"
 
     - name: Test
       run: |
