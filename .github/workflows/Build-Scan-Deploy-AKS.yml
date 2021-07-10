@@ -26,7 +26,7 @@ jobs:
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-    - name: 'Build and push image'
+    - name: 'Build image'
       uses: azure/docker-login@v1
       with:
         login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
@@ -34,6 +34,27 @@ jobs:
         password: ${{ secrets.REGISTRY_PASSWORD }}
     - run: |
         docker build . -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/whoamicore:${{ env.RELEASE_VERSION }}
+
+    - name: 'Container Scan'
+      uses: Azure/container-scan@v0
+      with:
+        image-name: ${{ env.REGISTRY_LOGIN_SERVER }}/whoamicore:${{ env.RELEASE_VERSION }}
+    
+    - name: Publish container scan results to ASC
+      uses: azure/publish-security-assessments@v0
+      with:
+        artifact-type: containerImage
+        subscription-token: ${{ secrets.ASC_SUBSCRIPTION_TOKEN }}
+        instrumentation-key: ${{ secrets.AI_INSTRUMENTATION_KEY }}
+        scan-results-path: ${{ steps.container-scan.outputs.scan-report-path }}
+
+    - name: 'Push image'
+      uses: azure/docker-login@v1
+      with:
+        login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
+        username: ${{ secrets.REGISTRY_USERNAME }}
+        password: ${{ secrets.REGISTRY_PASSWORD }}
+    - run: |
         docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/whoamicore:${{ env.RELEASE_VERSION }}
 
     - uses: azure/aks-set-context@v1
