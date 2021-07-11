@@ -49,7 +49,7 @@ jobs:
         docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/whoamicore:${{ env.RELEASE_VERSION }}
 
     - name: 'Container Scan'
-      id: container-scan
+      id: container_scan
       uses: Azure/container-scan@v0.1
       continue-on-error: true
       with:
@@ -59,9 +59,9 @@ jobs:
       uses: azure/publish-security-assessments@v0
       with:
         artifact-type: containerImage
-        subscription-token: ${{ secrets.ASC_SUBSCRIPTION_TOKEN }}
-        instrumentation-key: ${{ secrets.AI_INSTRUMENTATION_KEY }}
-        scan-results-path: ${{ steps.container-scan.outputs.scan-report-path }}
+        subscription-token: ${{ secrets.asc_subscription_token }}
+        instrumentation-key: ${{ secrets.ai_instrumentation_key }}
+        scan-results-path: ${{ steps.container_scan.outputs.scan-report-path }}
 
 #   deploy:
 #     needs: build
