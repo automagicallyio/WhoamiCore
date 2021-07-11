@@ -1,4 +1,4 @@
-name: Build, scan and push to AKS
+name: Build, scan and deploy to AKS
 
 on:
     push:
@@ -21,11 +21,11 @@ jobs:
         then
           echo "setting release version to commit sha"
           echo "RELEASE_VERSION=$(echo ${{ github.sha }})" >> $GITHUB_ENV
-          echo "::set-output name=release_version::${{ github.sha }})"
+          echo "::set-output name=release_version_var::${{ github.sha }})"
         else
           echo "setting release version to release tag version"
           echo "RELEASE_VERSION=$(echo ${GITHUB_REF#refs/tags/})" >> $GITHUB_ENV
-          echo "::set-output name=release_version::${GITHUB_REF#refs/tags/})"
+          echo "::set-output name=release_version_var::${GITHUB_REF#refs/tags/})"
         fi
 
     - name: Test
@@ -63,21 +63,21 @@ jobs:
         instrumentation-key: ${{ secrets.ai_instrumentation_key }}
         scan-results-path: ${{ steps.container_scan.outputs.scan-report-path }}
 
-#   deploy:
-#     needs: build
-#     runs-on: ubuntu-latest
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
     
-#     steps:
-#     - name: Set versio
-#       run: |
-#         # echo "RELEASE_VERSION=$(echo ${GITHUB_REF#refs/tags/})" >> $GITHUB_ENV
-          # echo "x" ${{ jobs.build.steps.setversion_step.outputs.release_version }}
-#         # echo "RELEASE_VERSION=$(echo ${{ jobs.build.steps.setversion_step.outputs.release_version }})" >> $GITHUB_ENV
+    steps:
+    - name: Set version
+      run: |
+        # echo "RELEASE_VERSION=$(echo ${GITHUB_REF#refs/tags/})" >> $GITHUB_ENV
+        echo "x" ${{ jobs.build.steps.setversion_step.outputs.release_version_var }}
+        echo "RELEASE_VERSION=$(echo ${{ jobs.build.steps.setversion_step.outputs.release_version_var }})" >> $GITHUB_ENV
 
-#     - name: Test
-#       run: |
-#         echo $RELEASE_VERSION
-#         echo ${{ env.RELEASE_VERSION }}
+    - name: Test
+      run: |
+        echo $RELEASE_VERSION
+        echo ${{ env.RELEASE_VERSION }}
 
     - uses: azure/aks-set-context@v1
       with:
