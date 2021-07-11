@@ -38,22 +38,22 @@ jobs:
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-    - name: 'Build image'
+    - name: 'Build and push image'
       uses: azure/docker-login@v1
       with:
         login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
         username: ${{ secrets.REGISTRY_USERNAME }}
         password: ${{ secrets.REGISTRY_PASSWORD }}
     - run: |
-        # docker build . -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/whoamicore:${{ env.RELEASE_VERSION }}
-        docker build . -t whoamicoreacrdev.azurecr.io/whoamicore:${{ env.RELEASE_VERSION }}
+        docker build . -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/whoamicore:${{ env.RELEASE_VERSION }}
+        docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/whoamicore:${{ env.RELEASE_VERSION }}
 
     - name: 'Container Scan'
       id: container-scan
       uses: Azure/container-scan@v0.1
       continue-on-error: true
       with:
-        image-name: whoamicoreacrdev.azurecr.io/whoamicore:${{ env.RELEASE_VERSION }}
+        image-name: ${{ secrets.REGISTRY_LOGIN_SERVER }}/whoamicore:${{ env.RELEASE_VERSION }}
     
     - name: Publish container scan results to ASC
       uses: azure/publish-security-assessments@v0
@@ -78,15 +78,6 @@ jobs:
 #       run: |
 #         echo $RELEASE_VERSION
 #         echo ${{ env.RELEASE_VERSION }}
-
-    - name: 'Push image'
-      uses: azure/docker-login@v1
-      with:
-        login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
-        username: ${{ secrets.REGISTRY_USERNAME }}
-        password: ${{ secrets.REGISTRY_PASSWORD }}
-    - run: |
-        docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/whoamicore:${{ env.RELEASE_VERSION }}
 
     - uses: azure/aks-set-context@v1
       with:
