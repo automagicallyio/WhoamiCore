@@ -21,11 +21,9 @@ jobs:
         then
           echo "setting release version to commit sha"
           echo "RELEASE_VERSION=$(echo ${{ github.sha }})" >> $GITHUB_ENV
-          echo "::set-output name=release_version_var::${{ github.sha }})"
         else
           echo "setting release version to release tag version"
           echo "RELEASE_VERSION=$(echo ${GITHUB_REF#refs/tags/})" >> $GITHUB_ENV
-          echo "::set-output name=release_version_var::${GITHUB_REF#refs/tags/})"
         fi
 
     - name: Test
@@ -68,11 +66,18 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
+    - uses: actions/checkout@v1
+
     - name: Set version
       run: |
-        # echo "RELEASE_VERSION=$(echo ${GITHUB_REF#refs/tags/})" >> $GITHUB_ENV
-        echo "x" ${{ jobs.build.steps.setversion_step.outputs.release_version_var }}
-        echo "RELEASE_VERSION=$(echo ${{ jobs.build.steps.setversion_step.outputs.release_version_var }})" >> $GITHUB_ENV
+        if [ "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]
+        then
+          echo "setting release version to commit sha"
+          echo "RELEASE_VERSION=$(echo ${{ github.sha }})" >> $GITHUB_ENV
+        else
+          echo "setting release version to release tag version"
+          echo "RELEASE_VERSION=$(echo ${GITHUB_REF#refs/tags/})" >> $GITHUB_ENV
+        fi
 
     - name: Test
       run: |
