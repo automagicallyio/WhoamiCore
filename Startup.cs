@@ -68,7 +68,8 @@ namespace WhoamiCore
             await context.Response.WriteAsync($"Process Architecture: {System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture.ToString()}{Environment.NewLine}");
             await context.Response.WriteAsync($"Processor count: {System.Environment.ProcessorCount}{Environment.NewLine}");
             await context.Response.WriteAsync($"System Version: {System.Runtime.InteropServices.RuntimeEnvironment.GetSystemVersion()}{Environment.NewLine}");
-            await context.Response.WriteAsync($"MS Build 2021 DevOps Highlights");
+            await context.Response.WriteAsync("Hello World!");
+            await context.Response.WriteAsync("MS Build 2021 DevOps Highlights");
             //Write HTTP headers
             foreach (var header in context.Request.Headers)
             {
