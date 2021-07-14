@@ -54,7 +54,7 @@ namespace WhoamiCore
         private static async Task WriteRequestInfo(HttpContext context)
         {
             //Write connection, request and system information
-            await context.Response.WriteAsync($"Hostname: {System.Net.Dns.GetHostName()}{Environment.NewLine}");
+            await context.Response.WriteAsync($"Hello from hostname: {System.Net.Dns.GetHostName()}{Environment.NewLine}");
             await context.Response.WriteAsync($"Method: {context.Request.Method}{Environment.NewLine}");
             await context.Response.WriteAsync($"Path: {context.Request.Path}{Environment.NewLine}");
             await context.Response.WriteAsync($"Scheme: {context.Request.Scheme}{Environment.NewLine}");
@@ -68,8 +68,6 @@ namespace WhoamiCore
             await context.Response.WriteAsync($"Process Architecture: {System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture.ToString()}{Environment.NewLine}");
             await context.Response.WriteAsync($"Processor count: {System.Environment.ProcessorCount}{Environment.NewLine}");
             await context.Response.WriteAsync($"System Version: {System.Runtime.InteropServices.RuntimeEnvironment.GetSystemVersion()}{Environment.NewLine}");
-            await context.Response.WriteAsync("Hello World!");
-            await context.Response.WriteAsync("MS Build 2021 DevOps Highlights");
             //Write HTTP headers
             foreach (var header in context.Request.Headers)
             {
