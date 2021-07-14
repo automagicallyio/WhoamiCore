@@ -54,7 +54,7 @@ namespace WhoamiCore
         private static async Task WriteRequestInfo(HttpContext context)
         {
             //Write connection, request and system information
-            await context.Response.WriteAsync($"Hello from hostname: {System.Net.Dns.GetHostName()}{Environment.NewLine}");
+            await context.Response.WriteAsync($"Test from hostname: {System.Net.Dns.GetHostName()}{Environment.NewLine}");
             await context.Response.WriteAsync($"Method: {context.Request.Method}{Environment.NewLine}");
             await context.Response.WriteAsync($"Path: {context.Request.Path}{Environment.NewLine}");
             await context.Response.WriteAsync($"Scheme: {context.Request.Scheme}{Environment.NewLine}");
