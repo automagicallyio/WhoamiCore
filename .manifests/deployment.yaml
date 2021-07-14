@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: whoamicore
-        image: index.docker.io/magohl/whoamicore
+        image: whoamicoreacrdev.azurecr.io/whoamicore:latest
         resources:
           limits:
             #memory: "128Mi"
