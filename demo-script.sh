@@ -1,3 +1,7 @@
+# walkthrough the code and environment
+# add image scanning. run pipeline. review  results
+# add publishing results to azure security center. run pipeline. review results.
+
 # init
 rgName=whoamicoreDev
 subId=subscription-id-goes-here
