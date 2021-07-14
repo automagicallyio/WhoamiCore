@@ -14,6 +14,7 @@ jobs:
     steps:
     - uses: actions/checkout@v1
 
+    # set version
     - name: Set version
       id: setversion_step
       run: |
@@ -26,16 +27,13 @@ jobs:
           echo "RELEASE_VERSION=$(echo ${GITHUB_REF#refs/tags/})" >> $GITHUB_ENV
         fi
 
-    - name: Test
-      run: |
-        echo $RELEASE_VERSION
-        echo ${{ env.RELEASE_VERSION }}
-        
+    # authenticate
     - name: 'Login via Azure CLI'
       uses: azure/login@v1
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+    # build and push image
     - name: 'Build and push image'
       uses: azure/docker-login@v1
       with:
@@ -46,20 +44,20 @@ jobs:
         docker build . -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/whoamicore:${{ env.RELEASE_VERSION }}
         docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/whoamicore:${{ env.RELEASE_VERSION }}
 
-    - name: 'Container Scan'
-      id: container_scan
-      uses: Azure/container-scan@v0.1
-      continue-on-error: true
-      with:
-        image-name: ${{ secrets.REGISTRY_LOGIN_SERVER }}/whoamicore:${{ env.RELEASE_VERSION }}
+    # - name: 'Container Scan'
+    #   id: container_scan
+    #   uses: Azure/container-scan@v0.1
+    #   continue-on-error: true
+    #   with:
+    #     image-name: ${{ secrets.REGISTRY_LOGIN_SERVER }}/whoamicore:${{ env.RELEASE_VERSION }}
     
-    - name: Publish container scan results to ASC
-      uses: azure/publish-security-assessments@v0
-      with:
-        artifact-type: containerImage
-        subscription-token: ${{ secrets.asc_subscription_token }}
-        instrumentation-key: ${{ secrets.ai_instrumentation_key }}
-        scan-results-path: ${{ steps.container_scan.outputs.scan-report-path }}
+    # - name: Publish container scan results to ASC
+    #   uses: azure/publish-security-assessments@v0
+    #   with:
+    #     artifact-type: containerImage
+    #     subscription-token: ${{ secrets.asc_subscription_token }}
+    #     instrumentation-key: ${{ secrets.ai_instrumentation_key }}
+    #     scan-results-path: ${{ steps.container_scan.outputs.scan-report-path }}
 
   deploy:
     needs: build
@@ -68,6 +66,7 @@ jobs:
     steps:
     - uses: actions/checkout@v1
 
+    # set version
     - name: Set version
       run: |
         if [ "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]
@@ -79,11 +78,7 @@ jobs:
           echo "RELEASE_VERSION=$(echo ${GITHUB_REF#refs/tags/})" >> $GITHUB_ENV
         fi
 
-    - name: Test
-      run: |
-        echo $RELEASE_VERSION
-        echo ${{ env.RELEASE_VERSION }}
-
+    # authenticate
     - uses: azure/aks-set-context@v1
       with:
         creds: '${{ secrets.AZURE_CREDENTIALS }}' # Azure credentials
@@ -91,6 +86,16 @@ jobs:
         cluster-name: 'whoamicoreAksDev'
       id: login
 
+    # create pull secret
+    - uses: azure/k8s-create-secret@v1
+      with:
+        container-registry-url: ${{ secrets.REGISTRY_LOGIN_SERVER }}
+        container-registry-username: ${{ secrets.REGISTRY_USERNAME }}
+        container-registry-password: ${{ secrets.REGISTRY_PASSWORD }}
+        secret-name: ${{ secrets.REGISTRY_IMAGE_PULL_SECRET }}
+        force: true
+
+    # Deploy app to AKS
     - uses: Azure/k8s-deploy@v1
       with:
         namespace: default
@@ -100,3 +105,5 @@ jobs:
           .manifests/service.yaml
         images: |
           ${{ secrets.REGISTRY_LOGIN_SERVER }}/whoamicore:${{ env.RELEASE_VERSION }}
+        imagepullsecrets: |
+          ${{ secrets.REGISTRY_IMAGE_PULL_SECRET }}
